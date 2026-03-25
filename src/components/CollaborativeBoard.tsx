@@ -130,7 +130,7 @@ export default function CollaborativeBoard() {
 
   if (!isJoined) {
     return (
-      <div className="flex items-center justify-center h-[600px] glass rounded-[40px] border border-white/10">
+      <div className="flex items-center justify-center h-[600px] glass-panel rounded-[40px] border border-white/10">
         <div className="max-w-md w-full p-12 text-center">
           <Users className="w-16 h-16 text-blue-500 mx-auto mb-6" />
           <h3 className="text-3xl font-display font-bold mb-4">Collaborative Workspace</h3>
@@ -157,7 +157,7 @@ export default function CollaborativeBoard() {
   }
 
   return (
-    <div className="relative h-[700px] glass rounded-[40px] border border-white/10 overflow-hidden group/board" ref={boardRef} onMouseMove={handleMouseMove}>
+    <div className="relative h-[700px] glass-panel rounded-[40px] border border-white/10 overflow-hidden group/board" ref={boardRef} onMouseMove={handleMouseMove}>
       {/* Board Header */}
       <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-20 bg-gradient-to-b from-black/50 to-transparent">
         <div className="flex items-center gap-4">
@@ -215,7 +215,7 @@ export default function CollaborativeBoard() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1, x: node.x, y: node.y }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="absolute w-64 p-6 glass rounded-3xl border border-white/10 cursor-grab active:cursor-grabbing group/node"
+              className="absolute w-64 p-6 glass-panel rounded-3xl border border-white/10 cursor-grab active:cursor-grabbing group/node"
               style={{ borderTop: `4px solid ${node.color}` }}
             >
               <div className="flex items-center justify-between mb-4">
@@ -264,7 +264,7 @@ export default function CollaborativeBoard() {
 
       {/* Footer Info */}
       <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-        <div className="px-4 py-2 glass rounded-full border border-white/10 text-[8px] uppercase tracking-[0.2em] font-black text-white/40">
+        <div className="px-4 py-2 glass-panel rounded-full border border-white/10 text-[8px] uppercase tracking-[0.2em] font-black text-white/40">
           Real-time Engine: Socket.io v4.8.1
         </div>
         <div className="flex items-center gap-2">

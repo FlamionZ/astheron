@@ -236,7 +236,7 @@ export default function VideoGenerator() {
             </p>
 
             {!hasKey ? (
-              <div className="glass p-8 rounded-3xl border border-white/10">
+              <div className="glass-panel p-8 rounded-[32px] border border-white/10">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                     <AlertCircle className="w-6 h-6 text-white" />
@@ -279,7 +279,7 @@ export default function VideoGenerator() {
                 </div>
                 
                 {/* Logo Upload Section */}
-                <div className="glass p-6 rounded-3xl border border-white/10">
+                <div className="glass-panel p-6 rounded-[32px] border border-white/10">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <ImageIcon className="w-4 h-4 text-white/60" />
@@ -361,7 +361,7 @@ export default function VideoGenerator() {
             )}
           </div>
 
-          <div className="relative aspect-video rounded-[40px] overflow-hidden glass border border-white/10 flex items-center justify-center group">
+          <div className="relative aspect-video rounded-[40px] overflow-hidden glass-panel border border-white/10 flex items-center justify-center group">
             <AnimatePresence mode="wait">
               {isGenerating ? (
                 <motion.div 

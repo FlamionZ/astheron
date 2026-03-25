@@ -2,6 +2,7 @@ import { motion, AnimatePresence, useInView, useScroll, useSpring, useTransform 
 import { useState, useEffect, useRef } from 'react';
 import { Cpu, Globe, Shield, Zap, ArrowRight, Code, Terminal, ShieldAlert, Bot, ArrowUp, CheckCircle2, X, ArrowLeft } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { trackEvent } from '@/src/lib/analytics';
 import Chatbot from './components/Chatbot';
 import VideoGenerator from './components/VideoGenerator';
 import ContactModal from './components/ContactModal';
@@ -64,7 +65,7 @@ function TestimonialSlider() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 1.1, y: -20 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="glass p-12 rounded-[40px] border border-white/10 relative overflow-hidden group"
+          className="glass-panel p-12 rounded-[40px] border border-white/10 relative overflow-hidden group"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
             <motion.div 
@@ -257,6 +258,7 @@ export default function App() {
           const id = entry.target.id as keyof typeof sectionSEO;
           if (sectionSEO[id]) {
             setActiveSection(id);
+            trackEvent('section_view', { section: id });
           }
         }
       });
@@ -288,6 +290,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-brand-bg selection:bg-white selection:text-black">
+      <Chatbot />
       {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-white z-[100] origin-left"
@@ -306,10 +309,10 @@ export default function App() {
         role="navigation"
         aria-label="Main navigation"
         className={cn(
-        "fixed top-0 w-full z-40 transition-all duration-300 border-b",
+        "fixed top-0 w-full z-40 transition-all duration-500 border-b",
         isScrolled 
-          ? "bg-brand-bg/90 backdrop-blur-xl border-white/10 py-3" 
-          : "bg-transparent border-transparent py-5"
+          ? "bg-black/40 backdrop-blur-2xl border-white/10 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.5)]" 
+          : "bg-transparent border-transparent py-6"
       )}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between transition-all duration-300">
           <Tooltip content="Back to Home" position="bottom">
@@ -341,7 +344,10 @@ export default function App() {
             </Tooltip>
             <Tooltip content="Get in Touch" position="bottom">
               <button 
-                onClick={() => setIsContactOpen(true)}
+                onClick={() => {
+                  setIsContactOpen(true);
+                  trackEvent('button_click', { button: 'Contact Us', location: 'navbar' });
+                }}
                 className={cn(
                   "px-5 py-2.5 bg-white text-black rounded-full hover:bg-white/90 transition-all duration-300",
                   isScrolled ? "scale-90" : "scale-100"
@@ -446,15 +452,15 @@ export default function App() {
               Pioneering the Future of Tech
             </motion.div>
             
-            <h1 className="text-6xl md:text-8xl font-display font-bold leading-[0.9] tracking-tighter mb-8 text-gradient flex flex-wrap gap-x-[0.2em]">
+            <h1 className="text-6xl md:text-8xl lg:text-[120px] font-display font-bold leading-[0.85] tracking-tighter mb-8 text-gradient flex flex-wrap gap-x-[0.2em]">
               {["ENGINEERING", "INTELLIGENT", "SYSTEMS."].map((word, i) => (
                 <motion.span
                   key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ 
                     duration: 0.8, 
-                    delay: i * 0.2, 
+                    delay: i * 0.15, 
                     ease: [0.16, 1, 0.3, 1] 
                   }}
                   className="inline-block"
@@ -464,7 +470,7 @@ export default function App() {
               ))}
             </h1>
 
-            <div className="flex flex-wrap gap-x-1.5 mb-10">
+            <div className="flex flex-wrap gap-x-1.5 mb-12 max-w-2xl">
               {"Astheron Technologies delivers enterprise-grade software solutions, advanced AI integrations, and cutting-edge cybersecurity tools.".split(" ").map((word, i) => (
                 <motion.span
                   key={i}
@@ -472,9 +478,9 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ 
                     duration: 0.6, 
-                    delay: 1.5 + (i * 0.08) 
+                    delay: 1.0 + (i * 0.04) 
                   }}
-                  className="text-lg md:text-xl text-brand-muted leading-relaxed"
+                  className="text-lg md:text-2xl text-brand-muted leading-relaxed font-light"
                 >
                   {word}
                 </motion.span>
@@ -484,43 +490,40 @@ export default function App() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 2.5 }}
+              transition={{ duration: 0.8, delay: 1.8 }}
               className="flex flex-wrap gap-4"
             >
               <motion.button 
                 whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: "0 0 40px rgba(255, 255, 255, 0.3)"
+                  scale: 1.02,
+                  boxShadow: "0 0 40px rgba(255, 255, 255, 0.2)"
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-white text-black rounded-full font-bold transition-all flex items-center gap-2"
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => trackEvent('button_click', { button: 'Get Started', location: 'hero' })}
+                className="px-8 py-4 bg-white text-black rounded-full font-bold transition-all flex items-center gap-2 text-sm uppercase tracking-wider"
                 aria-label="Get started with Astheron Technologies"
               >
                 Get Started <ArrowRight className="w-4 h-4" />
               </motion.button>
               <motion.button 
-                whileHover={{ 
-                  scale: 1.05,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  borderColor: "rgba(255, 255, 255, 0.3)"
+                whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.1)" }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  trackEvent('button_click', { button: 'View Products', location: 'hero' });
+                  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 glass rounded-full font-bold transition-all"
+                className="px-8 py-4 glass-panel rounded-full font-bold transition-all border border-white/10 text-sm uppercase tracking-wider"
                 aria-label="View our technological products"
               >
                 View Products
               </motion.button>
               <motion.button 
-                whileHover={{ 
-                  scale: 1.05,
-                  backgroundColor: "rgba(0, 0, 0, 0.8)",
-                  borderColor: "rgba(255, 255, 255, 0.2)"
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-black/40 border border-white/10 rounded-full font-bold transition-all flex items-center gap-2"
+                whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.1)" }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-8 py-4 bg-black/40 border border-white/10 rounded-full font-bold transition-all flex items-center gap-2 text-sm uppercase tracking-wider"
                 aria-label="Learn more about our cybersecurity solutions"
               >
                 <Shield className="w-4 h-4" /> Cybersecurity
@@ -582,7 +585,7 @@ export default function App() {
                   }
                 }}
                 whileHover="hover"
-                className="p-8 glass rounded-3xl group cursor-pointer transition-all duration-500 hover:border-white/20"
+                className="p-8 glass-panel rounded-3xl group cursor-pointer transition-all duration-500 hover:border-[rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_rgba(255,255,255,0.05)]"
               >
                 <motion.div 
                   layoutId={`service-icon-${service.id}`}
@@ -609,7 +612,7 @@ export default function App() {
                       }
                     }
                   }}
-                  className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:text-black group-hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] transition-all duration-300"
+                  className="w-12 h-12 bg-[rgba(255,255,255,0.05)] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:text-black group-hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] transition-all duration-300"
                 >
                   <service.icon className="w-6 h-6" />
                 </motion.div>
@@ -618,11 +621,10 @@ export default function App() {
                   variants={{
                     hover: { 
                       scale: 1.05, 
-                      color: "#ffffff",
                       transition: { duration: 0.3, ease: "easeOut" }
                     }
                   }}
-                  className="text-xl font-bold mb-4 origin-left"
+                  className="text-xl font-bold mb-4 origin-left group-hover:text-white transition-colors duration-300"
                 >
                   {service.title}
                 </motion.h3>
@@ -631,11 +633,10 @@ export default function App() {
                   variants={{
                     hover: { 
                       scale: 1.02, 
-                      color: "rgba(255,255,255,0.8)",
                       transition: { duration: 0.3, ease: "easeOut" }
                     }
                   }}
-                  className="text-brand-muted text-sm leading-relaxed mb-6 origin-left"
+                  className="text-brand-muted text-sm leading-relaxed mb-6 origin-left group-hover:text-white/80 transition-colors duration-300"
                 >
                   {service.description}
                 </motion.p>
@@ -694,14 +695,13 @@ export default function App() {
                     transition: { duration: 0.5 }
                   },
                   hover: {
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
                     transition: { duration: 0.3 }
                   }
                 }}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="relative p-10 rounded-[40px] overflow-hidden group cursor-pointer"
+                className="relative p-10 rounded-[32px] overflow-hidden group cursor-pointer border border-white/5 hover:border-white/20 hover:bg-white/[0.03] transition-all duration-500"
               >
                 {/* Parallax Background Gradient */}
                 <motion.div 
@@ -856,10 +856,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="relative">
-              <div className="aspect-square rounded-[60px] overflow-hidden glass p-4">
-                <div className="w-full h-full rounded-[40px] bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center">
-                   <div className="w-40 h-40 bg-white rounded-full flex items-center justify-center shadow-[0_0_100_px_rgba(255,255,255,0.2)]">
-                      <span className="text-black font-display font-black text-8xl" aria-hidden="true">A</span>
+              <div className="aspect-square rounded-[60px] bg-[#0a0a0a] border border-white/5 p-4">
+                <div className="w-full h-full rounded-[40px] bg-[#141414] flex items-center justify-center">
+                   <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-black font-display font-black text-7xl" aria-hidden="true">A</span>
                    </div>
                 </div>
               </div>
@@ -867,7 +867,7 @@ export default function App() {
                 initial={{ opacity: 0, scale: 0.8, y: 40 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
-                className="absolute -bottom-10 -right-10 w-72 glass rounded-[40px] p-8 hidden md:flex flex-col gap-6 shadow-2xl border border-white/20"
+                className="absolute -bottom-12 -right-12 w-80 bg-gradient-to-b from-[#2a2a2a] to-[#111111] rounded-[40px] p-8 hidden md:flex flex-col gap-6 shadow-2xl border border-white/10"
               >
                 <motion.div 
                   initial="hidden"
@@ -887,24 +887,15 @@ export default function App() {
                       hidden: { opacity: 0, x: -10 },
                       visible: { opacity: 1, x: 0 }
                     }}
-                    whileHover="hover"
-                    className="cursor-default group"
+                    className="cursor-default"
                   >
-                    <motion.div 
-                      variants={{
-                        hover: { scale: 1.05, x: 0 }
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      className="text-4xl font-display font-bold mb-1 flex items-baseline origin-left"
-                    >
+                    <div className="text-4xl font-display font-bold mb-2 flex items-baseline">
                       <Counter value={120} />
                       <span className="text-white/40 ml-1">+</span>
-                    </motion.div>
-                    <motion.div 
-                      className="text-[10px] uppercase tracking-[0.2em] font-black transition-colors opacity-60 group-hover:opacity-100 group-hover:text-white"
-                    >
+                    </div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] font-black text-white/60">
                       Projects Delivered
-                    </motion.div>
+                    </div>
                   </motion.div>
 
                   <div className="h-px bg-white/10 w-full" />
@@ -914,24 +905,15 @@ export default function App() {
                       hidden: { opacity: 0, x: -10 },
                       visible: { opacity: 1, x: 0 }
                     }}
-                    whileHover="hover"
-                    className="cursor-default group"
+                    className="cursor-default"
                   >
-                    <motion.div 
-                      variants={{
-                        hover: { scale: 1.05, x: 0 }
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      className="text-4xl font-display font-bold mb-1 flex items-baseline origin-left"
-                    >
+                    <div className="text-4xl font-display font-bold mb-2 flex items-baseline">
                       <Counter value={99} />
                       <span className="text-white/40 ml-1">%</span>
-                    </motion.div>
-                    <motion.div 
-                      className="text-[10px] uppercase tracking-[0.2em] font-black transition-colors opacity-60 group-hover:opacity-100 group-hover:text-white"
-                    >
+                    </div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] font-black text-white/60">
                       Client Satisfaction
-                    </motion.div>
+                    </div>
                   </motion.div>
                 </motion.div>
                 
@@ -942,24 +924,37 @@ export default function App() {
                       initial={{ width: 0 }}
                       whileInView={{ width: "94%" }}
                       transition={{ duration: 2, ease: "easeOut", delay: 1 }}
-                      className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.6)]"
+                      className="h-full bg-white"
                     />
                   </div>
                   <div className="mt-3 flex justify-between items-center">
-                    <span className="text-[9px] text-white/30 font-mono tracking-tighter uppercase">System Status: Optimal</span>
-                    <span className="text-[9px] text-white/50 font-mono font-bold">94%</span>
+                    <span className="text-[8px] text-white/40 font-mono tracking-tighter uppercase">System Status: Optimal</span>
+                    <span className="text-[8px] text-white/60 font-mono font-bold">94%</span>
                   </div>
                 </div>
               </motion.div>
             </div>
             <div>
               <h2 className="text-4xl md:text-5xl font-display font-bold mb-8">WE ARE ASTHERON.</h2>
-              <p className="text-xl text-brand-muted leading-relaxed mb-8">
-                Founded on the principles of innovation and technical excellence, 
-                Astheron Technologies is a collective of engineers, designers, 
-                and visionaries dedicated to building the next generation of 
-                digital infrastructure.
-              </p>
+              <div className="space-y-6 mb-10">
+                <p className="text-xl text-brand-muted leading-relaxed">
+                  Astheron Technologies is a collective of engineers, designers, and visionaries dedicated to building the next generation of digital infrastructure.
+                </p>
+                <ul className="space-y-4 text-lg text-brand-muted">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-6 h-6 text-white/40 shrink-0 mt-0.5" />
+                    <span><strong className="text-white">Innovation-Driven:</strong> We push the boundaries of what's possible in tech.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-6 h-6 text-white/40 shrink-0 mt-0.5" />
+                    <span><strong className="text-white">Technical Excellence:</strong> Delivering robust, scalable, and secure solutions.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-6 h-6 text-white/40 shrink-0 mt-0.5" />
+                    <span><strong className="text-white">Future-Ready:</strong> Building the foundation for tomorrow's digital landscape.</span>
+                  </li>
+                </ul>
+              </div>
               <motion.div 
                 initial="hidden"
                 whileInView="visible"
@@ -996,7 +991,7 @@ export default function App() {
                         transition: { type: "spring", stiffness: 200, damping: 15 }
                       }
                     }}
-                    className="w-12 h-12 shrink-0 glass rounded-xl flex items-center justify-center"
+                    className="w-12 h-12 shrink-0 glass-panel rounded-xl flex items-center justify-center"
                   >
                     <Shield className="w-5 h-5" />
                   </motion.div>
@@ -1028,7 +1023,7 @@ export default function App() {
                         transition: { type: "spring", stiffness: 200, damping: 15 }
                       }
                     }}
-                    className="w-12 h-12 shrink-0 glass rounded-xl flex items-center justify-center"
+                    className="w-12 h-12 shrink-0 glass-panel rounded-xl flex items-center justify-center"
                   >
                     <Zap className="w-5 h-5" />
                   </motion.div>
@@ -1152,7 +1147,16 @@ export default function App() {
                 </li>
                 <li>
                   <Tooltip content="Get in touch" position="right">
-                    <button onClick={() => setIsContactOpen(true)} className="hover:text-white transition-colors" aria-label="Contact Us">Contact</button>
+                    <button 
+                      onClick={() => {
+                        setIsContactOpen(true);
+                        trackEvent('button_click', { button: 'Contact Us', location: 'footer' });
+                      }} 
+                      className="hover:text-white transition-colors" 
+                      aria-label="Contact Us"
+                    >
+                      Contact
+                    </button>
                   </Tooltip>
                 </li>
                 <li>
@@ -1180,9 +1184,6 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Chatbot Integration */}
-      <Chatbot />
-
       {/* Expanded Service View */}
       <AnimatePresence>
         {selectedService && (
@@ -1196,7 +1197,7 @@ export default function App() {
             />
             <motion.div
               layoutId={`service-card-${selectedService.id}`}
-              className="fixed inset-4 md:inset-10 lg:inset-20 bg-brand-bg z-[101] rounded-[40px] overflow-hidden border border-white/10 flex flex-col shadow-2xl"
+              className="fixed inset-4 md:inset-10 lg:inset-20 bg-brand-bg z-[101] rounded-[40px] overflow-hidden border border-[rgba(255,255,255,0.1)] flex flex-col shadow-2xl"
             >
               <div className="flex-1 overflow-y-auto p-8 md:p-16 lg:p-24 custom-scrollbar">
                 <div className="max-w-7xl mx-auto">
@@ -1324,6 +1325,7 @@ export default function App() {
                           <div className="flex flex-wrap gap-4 pt-4">
                             <button 
                               onClick={() => {
+                                trackEvent('button_click', { button: 'Start Project', location: 'service_modal', service: selectedService.title });
                                 setSelectedService(null);
                                 setIsContactOpen(true);
                               }}
@@ -1356,121 +1358,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Service Detail Modal */}
-      <AnimatePresence>
-        {selectedService && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedService(null)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] cursor-zoom-out"
-            />
-            <motion.div
-              layoutId={`service-card-${selectedService.id}`}
-              className="fixed inset-4 md:inset-10 lg:inset-20 z-[101] glass rounded-[40px] border border-white/20 overflow-hidden flex flex-col md:flex-row shadow-2xl"
-            >
-              {/* Left Side - Visual/Icon */}
-              <div className="w-full md:w-1/3 bg-white/5 p-12 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-white/10 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
-                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                  transition={{ delay: 0.2, type: "spring" }}
-                  className="w-32 h-32 bg-white rounded-[40px] flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(255,255,255,0.2)]"
-                >
-                  <selectedService.icon className="w-16 h-16 text-black" />
-                </motion.div>
-                <motion.h2 
-                  layoutId={`service-title-${selectedService.id}`}
-                  className="text-3xl font-display font-bold text-center mb-4"
-                >
-                  {selectedService.title}
-                </motion.h2>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {selectedService.tags.map((tag, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-white/10 text-[10px] uppercase tracking-widest font-bold text-white/60">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
 
-              {/* Right Side - Content */}
-              <div className="flex-1 overflow-y-auto p-12 md:p-20 custom-scrollbar">
-                <div className="max-w-3xl">
-                  <div className="mb-12">
-                    <h4 className="text-xs uppercase tracking-[0.3em] text-white/40 font-bold mb-6">Overview</h4>
-                    <motion.p 
-                      layoutId={`service-desc-${selectedService.id}`}
-                      className="text-xl md:text-2xl text-white/90 leading-relaxed font-light"
-                    >
-                      {selectedService.longDescription}
-                    </motion.p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-                    <div>
-                      <h4 className="text-xs uppercase tracking-[0.3em] text-white/40 font-bold mb-8">Key Features</h4>
-                      <ul className="space-y-4">
-                        {selectedService.features.map((feature, i) => (
-                          <li key={i} className="flex items-center gap-3 text-brand-muted">
-                            <CheckCircle2 className="w-5 h-5 text-white" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="text-xs uppercase tracking-[0.3em] text-white/40 font-bold mb-8">Our Approach</h4>
-                      <div className="p-8 rounded-3xl bg-white/5 border border-white/10 relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-white transition-colors" />
-                        <p className="text-brand-muted leading-relaxed italic">
-                          "{selectedService.approach}"
-                        </p>
-                        <div className="mt-8 flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                            <Zap className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="text-[10px] uppercase tracking-widest font-bold text-white/40">
-                            Engineered for Excellence
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-4 pt-12 border-t border-white/10">
-                    <button 
-                      onClick={() => {
-                        setSelectedService(null);
-                        setIsContactOpen(true);
-                      }}
-                      className="px-10 py-5 bg-white text-black rounded-full font-bold hover:bg-white/90 transition-all flex items-center gap-3 group"
-                    >
-                      Start a Project <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                    <button 
-                      onClick={() => setSelectedService(null)}
-                      className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full font-bold hover:bg-white/10 transition-all"
-                    >
-                      Close Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <button 
-                onClick={() => setSelectedService(null)}
-                className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* Contact Modal */}
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />

@@ -146,7 +146,7 @@ export default function CaseStudies() {
               onClick={() => setSelectedId(study.id)}
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="min-w-[300px] md:min-w-[450px] aspect-[4/5] relative rounded-[40px] overflow-hidden cursor-pointer group snap-start"
+              className="min-w-[300px] md:min-w-[450px] aspect-[4/5] relative rounded-[32px] overflow-hidden cursor-pointer group snap-start border border-white/10 hover:border-white/30 transition-colors"
             >
               <motion.img 
                 layoutId={`image-${study.id}`}
@@ -155,18 +155,19 @@ export default function CaseStudies() {
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
               
-              <div className="absolute inset-0 p-8 flex flex-col justify-end">
+              <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end">
                 <motion.div 
                   layoutId={`category-${study.id}`}
-                  className="text-[10px] uppercase tracking-[0.2em] font-black text-white/60 mb-2"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[9px] uppercase tracking-[0.2em] font-black text-white mb-4 w-fit"
                 >
+                  <study.icon className="w-3 h-3" />
                   {study.category}
                 </motion.div>
                 <motion.h3 
                   layoutId={`title-${study.id}`}
-                  className="text-2xl md:text-3xl font-display font-bold text-white mb-4 leading-tight"
+                  className="text-2xl md:text-4xl font-display font-bold text-white mb-4 leading-tight"
                 >
                   {study.title}
                 </motion.h3>
@@ -203,7 +204,7 @@ export default function CaseStudies() {
             />
             <motion.div
               layoutId={`card-${selectedId}`}
-              className="fixed inset-4 md:inset-10 lg:inset-20 bg-brand-bg z-[101] rounded-[40px] overflow-hidden border border-white/10 flex flex-col md:flex-row shadow-2xl"
+              className="fixed inset-4 md:inset-10 lg:inset-20 bg-brand-bg z-[101] rounded-[40px] overflow-hidden border border-[rgba(255,255,255,0.1)] flex flex-col md:flex-row shadow-2xl"
             >
               <div className="w-full md:w-1/2 h-64 md:h-auto relative">
                 <motion.img 
@@ -233,7 +234,7 @@ export default function CaseStudies() {
                 </button>
                 <motion.div 
                   layoutId={`category-${selectedId}`}
-                  className="text-[10px] uppercase tracking-[0.3em] font-black text-white/40 mb-4"
+                  className="text-[10px] uppercase tracking-[0.3em] font-black text-[rgba(255,255,255,0.4)] mb-4"
                 >
                   {selectedStudy.category} — {selectedStudy.client}
                 </motion.div>

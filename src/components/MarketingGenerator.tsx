@@ -20,11 +20,18 @@ const tones = [
   { id: 'technical', label: 'Technical', icon: '⚙️' }
 ];
 
+const lengths = [
+  { id: 'short', label: 'Short', desc: '1 Sentence' },
+  { id: 'medium', label: 'Medium', desc: '2-3 Sentences' },
+  { id: 'long', label: 'Long', desc: '4+ Sentences' }
+];
+
 export default function MarketingGenerator() {
   const [selectedServices, setSelectedServices] = useState<string[]>([services[0]]);
   const [companyName, setCompanyName] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [selectedTones, setSelectedTones] = useState<string[]>([tones[0].id]);
+  const [selectedLength, setSelectedLength] = useState<string>(lengths[1].id);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCopy, setGeneratedCopy] = useState('');
   const [copied, setCopied] = useState(false);
@@ -51,7 +58,13 @@ export default function MarketingGenerator() {
     setIsGenerating(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `Generate a high-impact marketing headline and a short paragraph (max 3 sentences) for a partnership between Astheron Technologies and ${companyName || 'a client'}. 
+      
+      const lengthInstruction = 
+        selectedLength === 'short' ? 'a short paragraph (max 1 sentence)' :
+        selectedLength === 'medium' ? 'a medium paragraph (2-3 sentences)' :
+        'a long paragraph (4+ sentences)';
+
+      const prompt = `Generate a high-impact marketing headline and ${lengthInstruction} for a partnership between Astheron Technologies and ${companyName || 'a client'}. 
       Services: ${selectedServices.join(', ')}
       Target Audience: ${targetAudience}
       Tones: ${selectedTones.map(t => tones.find(tone => tone.id === t)?.label).join(', ')}
@@ -99,9 +112,14 @@ export default function MarketingGenerator() {
               powered by Astheron intelligence.
             </p>
 
-            <div className="space-y-8">
+            <div className="space-y-8 glass-panel p-8 md:p-10 rounded-[32px] relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/50 via-purple-500/50 to-transparent" />
+              
               <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/40">Select Services</label>
+                <label className="flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-black text-white/40">
+                  <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white/80">1</span>
+                  Select Services
+                </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {services.map((service) => (
                     <button
@@ -121,29 +139,38 @@ export default function MarketingGenerator() {
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/40">Company Name</label>
+                <label className="flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-black text-white/40">
+                  <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white/80">2</span>
+                  Company Name
+                </label>
                 <input
                   type="text"
                   placeholder="Your Company Name..."
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/40 transition-colors"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all font-mono text-sm"
                 />
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/40">Target Audience</label>
+                <label className="flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-black text-white/40">
+                  <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white/80">3</span>
+                  Target Audience
+                </label>
                 <input
                   type="text"
                   placeholder="e.g., Fintech Startups, Enterprise CTOs..."
                   value={targetAudience}
                   onChange={(e) => setTargetAudience(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/40 transition-colors"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/40 focus:bg-white/5 transition-all font-mono text-sm"
                 />
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-white/40">Brand Tones</label>
+                <label className="flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-black text-white/40">
+                  <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white/80">4</span>
+                  Brand Tones
+                </label>
                 <div className="flex flex-wrap gap-3">
                   {tones.map((tone) => (
                     <button
@@ -162,10 +189,37 @@ export default function MarketingGenerator() {
                 </div>
               </div>
 
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] font-black text-white/40">
+                  <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-white/80">5</span>
+                  Copy Length
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {lengths.map((length) => (
+                    <button
+                      key={length.id}
+                      onClick={() => setSelectedLength(length.id)}
+                      className={cn(
+                        "flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-2xl text-xs transition-all border",
+                        selectedLength === length.id
+                          ? "bg-white text-black border-white" 
+                          : "bg-white/5 text-white/60 border-white/10 hover:bg-white/10"
+                      )}
+                    >
+                      <span className="font-bold">{length.label}</span>
+                      <span className={cn(
+                        "text-[9px] uppercase tracking-wider",
+                        selectedLength === length.id ? "text-black/60" : "text-white/40"
+                      )}>{length.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
                 onClick={generateCopy}
                 disabled={isGenerating || !targetAudience.trim() || selectedServices.length === 0 || selectedTones.length === 0}
-                className="w-full py-6 bg-white text-black rounded-3xl font-black uppercase tracking-widest text-sm hover:bg-white/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="w-full py-6 bg-white text-black rounded-3xl font-black uppercase tracking-widest text-sm hover:bg-white/90 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
               >
                 {isGenerating ? (
                   <RefreshCw className="w-5 h-5 animate-spin" />
@@ -181,8 +235,8 @@ export default function MarketingGenerator() {
 
           <div className="relative lg:sticky lg:top-32">
             <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-3xl opacity-50" />
-            <div className="relative glass rounded-[40px] border border-white/10 overflow-hidden shadow-2xl">
-              <div className="bg-white/5 px-8 py-4 border-bottom border-white/10 flex items-center justify-between">
+            <div className="relative glass-panel rounded-[40px] border border-white/10 overflow-hidden shadow-2xl">
+              <div className="bg-white/5 px-8 py-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-white/40" />
                   <span className="text-[10px] uppercase tracking-widest font-black text-white/40">Output Terminal</span>

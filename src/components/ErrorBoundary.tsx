@@ -45,7 +45,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="relative w-full max-w-lg glass rounded-[40px] border border-white/10 p-12 text-center shadow-2xl"
+            className="relative w-full max-w-lg glass-panel rounded-[40px] border border-white/10 p-12 text-center shadow-2xl"
           >
             <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-white/20">
               <AlertTriangle className="w-10 h-10 text-white" />

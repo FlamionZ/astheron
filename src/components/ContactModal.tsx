@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Send, CheckCircle2, Loader2, Sparkles, Wand2, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
+import { trackEvent } from '@/src/lib/analytics';
 import { GoogleGenAI } from "@google/genai";
 
 interface ContactModalProps {
@@ -64,6 +65,9 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Track form submission
+    trackEvent('form_submit', { form: 'Contact Us', name: formData.name, email: formData.email });
+    
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
@@ -103,7 +107,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-lg glass rounded-[40px] border border-white/10 overflow-hidden shadow-2xl"
+            className="relative w-full max-w-lg glass-panel rounded-[40px] border border-white/10 overflow-hidden shadow-2xl"
           >
             <div className="p-8 md:p-12">
               <div className="flex justify-between items-start mb-8">

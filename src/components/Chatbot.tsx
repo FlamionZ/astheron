@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Send, Bot, User, X, MessageSquare, Loader2, Sparkles, Paperclip, FileText, Image as ImageIcon, Trash2, AlertCircle, RefreshCw } from 'lucide-react';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
@@ -230,7 +231,7 @@ export default function Chatbot() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 z-50 p-4 bg-white text-black rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center"
+        className="fixed bottom-8 right-8 z-[100] p-4 bg-white text-black rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center"
         aria-label="Open Aron AI assistant"
         aria-expanded={isOpen}
         aria-controls="chatbot-window"
@@ -239,7 +240,7 @@ export default function Chatbot() {
       </button>
 
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && createPortal(
           <motion.div
             id="chatbot-window"
             role="dialog"
@@ -247,7 +248,7 @@ export default function Chatbot() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-8 z-50 w-[400px] h-[600px] glass rounded-2xl flex flex-col overflow-hidden shadow-2xl"
+            className="fixed bottom-24 right-8 z-[100] w-[400px] h-[600px] glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl"
           >
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
@@ -464,7 +465,8 @@ export default function Chatbot() {
                 <p className="text-[10px] text-white/40 mt-2 uppercase tracking-widest animate-pulse">Processing files...</p>
               )}
             </div>
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
       </AnimatePresence>
     </>
