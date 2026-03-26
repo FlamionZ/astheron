@@ -82,7 +82,82 @@
   0% {
    transform: translate3d(-90px,0,0);
   }
-  100% { 
+  100% {
     transform: translate3d(85px,0,0);
+  }
+}
+
+/* Animated text gradient */
+.text-gradient-animated {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(90deg, #ffffff, rgba(255,255,255,0.6), #ffffff, rgba(255,255,255,0.6), #ffffff);
+  background-size: 300% 100%;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Marquee animation for trust bar */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Focus-visible indicators */
+*:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+  }
+
+  .parallax > use {
+    animation: none !important;
+  }
+
+  .waves {
+    display: none;
+  }
+
+  .text-gradient-animated {
+    animation: none !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+/* Responsive spacing utilities */
+@media (max-width: 768px) {
+  .section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
 }

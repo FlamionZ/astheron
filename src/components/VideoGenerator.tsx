@@ -144,7 +144,7 @@ export default function VideoGenerator() {
 
     try {
       // Create a new instance right before the call to ensure fresh API key
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
       
       setStatus('Analyzing Prompt & Scene Context...');
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -193,7 +193,7 @@ export default function VideoGenerator() {
         const response = await fetch(downloadLink, {
           method: 'GET',
           headers: {
-            'x-goog-api-key': process.env.API_KEY!,
+            'x-goog-api-key': import.meta.env.VITE_GEMINI_API_KEY,
           },
         });
 
@@ -220,7 +220,7 @@ export default function VideoGenerator() {
   };
 
   return (
-    <section id="video-gen" className="py-32 px-6 bg-white/[0.01]">
+    <section id="video-gen" className="py-20 md:py-32 px-4 md:px-6 bg-white/[0.01]">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div>

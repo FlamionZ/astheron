@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Send, Copy, Check, RefreshCw, Terminal, Wand2 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { cn } from '@/src/lib/utils';
 
 const services = [
@@ -57,29 +56,41 @@ export default function MarketingGenerator() {
     
     setIsGenerating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      
-      const lengthInstruction = 
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      if (!apiKey) throw new Error('API key not configured');
+
+      const lengthInstruction =
         selectedLength === 'short' ? 'a short paragraph (max 1 sentence)' :
         selectedLength === 'medium' ? 'a medium paragraph (2-3 sentences)' :
         'a long paragraph (4+ sentences)';
 
-      const prompt = `Generate a high-impact marketing headline and ${lengthInstruction} for a partnership between Astheron Technologies and ${companyName || 'a client'}. 
+      const prompt = `Generate a high-impact marketing headline and ${lengthInstruction} for a partnership between Astheron Technologies and ${companyName || 'a client'}.
       Services: ${selectedServices.join(', ')}
       Target Audience: ${targetAudience}
       Tones: ${selectedTones.map(t => tones.find(tone => tone.id === t)?.label).join(', ')}
-      
+
       Astheron is a high-end engineering collective focused on innovation, security, and technical excellence.
       Format the output as:
       Headline: [Headline]
       Body: [Paragraph]`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-120b',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.8,
+          max_tokens: 1024,
+        }),
       });
 
-      setGeneratedCopy(response.text || 'Failed to generate copy. Please try again.');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setGeneratedCopy(data.choices?.[0]?.message?.content || 'Failed to generate copy. Please try again.');
     } catch (error) {
       console.error('Generation error:', error);
       setGeneratedCopy('An error occurred during generation. Please check your connection.');
@@ -95,7 +106,7 @@ export default function MarketingGenerator() {
   };
 
   return (
-    <section id="ai-generator" className="py-32 px-6 bg-white/[0.01] border-y border-white/5">
+    <section id="ai-generator" className="py-20 md:py-32 px-4 md:px-6 bg-white/[0.01] border-y border-white/5">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           <div>

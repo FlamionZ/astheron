@@ -1,0 +1,52 @@
+<h2>How should the homepage and new pages relate?</h2>
+<p class="subtitle">This determines the overall site architecture</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Keep Homepage + Add Subpages</h3>
+      <p>The current scrollable homepage stays as the landing page. New pages (e.g., <code>/services</code>, <code>/blog</code>, <code>/portfolio</code>) are separate routes. Navbar updates with links to both anchor sections and new pages.</p>
+      <div style="margin-top:12px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:13px;">
+        <strong>Structure:</strong><br>
+        <code>/</code> → Current homepage (hero, services grid, products, testimonials, etc.)<br>
+        <code>/services</code> → Detailed services page<br>
+        <code>/blog</code> → Blog listing<br>
+        <code>/portfolio</code> → Projects showcase<br>
+        <code>/about</code> → Team & company story<br>
+        <code>/careers</code> → Job listings<br>
+        <code>/contact</code> → Full contact page
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Slim Down Homepage + Move Content to Pages</h3>
+      <p>Homepage becomes a shorter, punchier landing (hero + brief highlights + CTA). Detailed content moves to dedicated pages. Less scrolling on homepage, more focused subpages.</p>
+      <div style="margin-top:12px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:13px;">
+        <strong>Structure:</strong><br>
+        <code>/</code> → Slim hero + highlights + CTAs (no full services grid or testimonials)<br>
+        <code>/services</code> → Full services detail (absorbs homepage services section)<br>
+        <code>/portfolio</code> → Projects (absorbs case studies section)<br>
+        <code>/about</code> → About + testimonials (absorbs about + testimonials sections)<br>
+        Other pages same as option A
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Full Multi-Page Site (No Scroll Homepage)</h3>
+      <p>Complete restructure — homepage is just hero + navigation cards to each section. All content lives on dedicated pages. Traditional multi-page website feel.</p>
+      <div style="margin-top:12px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:13px;">
+        <strong>Structure:</strong><br>
+        <code>/</code> → Hero + navigation grid linking to all pages<br>
+        All content distributed across subpages<br>
+        No scrolling sections on homepage
+      </div>
+    </div>
+  </div>
+</div>

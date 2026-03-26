@@ -1,8 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Send, Bot, User, X, MessageSquare, Loader2, Sparkles, Paperclip, FileText, Image as ImageIcon, Trash2, AlertCircle, RefreshCw } from 'lucide-react';
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { Send, User, X, Loader2, Paperclip, FileText, Image as ImageIcon, Trash2, AlertCircle, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/src/lib/utils';
 
@@ -127,7 +126,7 @@ export default function Chatbot() {
     setError(null);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
       if (!apiKey) {
         throw new Error('API_KEY_MISSING');
       }
@@ -136,43 +135,49 @@ export default function Chatbot() {
         throw new Error('OFFLINE');
       }
 
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const contents = messages.map(m => ({
-        role: m.role,
-        parts: [{ text: m.content }]
-      }));
-
-      // Add the new user message with files
-      const userParts: any[] = [{ text: userMessage || "Analyze the attached files." }];
-      currentFiles.forEach(file => {
-        userParts.push({
-          inlineData: {
-            data: file.data,
-            mimeType: file.mimeType
-          }
-        });
-      });
-
-      contents.push({
-        role: 'user',
-        parts: userParts
-      });
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents,
-        config: {
-          systemInstruction: "You are Aron AI, the official assistant for Astheron Technologies. Astheron is a leading tech company specializing in Website Development, System Architecture, Mobile Applications, and AI Solutions. Our key products include 'Aron AI' (WhatsApp Chatbot), a professional Pentest/Hacking Agent, and an Anti-Gambling system. Be professional, enterprise-focused, and helpful. If files are attached, analyze them thoroughly and discuss them in the context of Astheron's expertise. Use your high-thinking capabilities to provide deep insights.",
-          thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+      const chatMessages = [
+        {
+          role: 'system' as const,
+          content: "You are Aron AI, the official assistant for Astheron Technologies. Astheron is a leading tech company specializing in Website Development, System Architecture, Mobile Applications, and AI Solutions. Our key products include 'Aron AI' (WhatsApp Chatbot), a professional Pentest/Hacking Agent, and an Anti-Gambling system. Be professional, enterprise-focused, and helpful."
+        },
+        ...messages.map(m => ({
+          role: m.role === 'model' ? 'assistant' as const : 'user' as const,
+          content: m.content
+        })),
+        {
+          role: 'user' as const,
+          content: userMessage + (currentFiles.length > 0 ? `\n\n[User attached ${currentFiles.length} file(s): ${currentFiles.map(f => f.name).join(', ')}]` : '')
         }
+      ];
+
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-120b',
+          messages: chatMessages,
+          temperature: 0.7,
+          max_tokens: 2048,
+        }),
       });
 
-      if (!response.text) {
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        const errMsg = errBody?.error?.message || `HTTP ${res.status}`;
+        if (res.status === 429) throw new Error('429: ' + errMsg);
+        throw new Error(errMsg);
+      }
+
+      const data = await res.json();
+      const text = data.choices?.[0]?.message?.content ?? '';
+      if (!text) {
         throw new Error('EMPTY_RESPONSE');
       }
 
-      setMessages(prev => [...prev, { role: 'model', content: response.text }]);
+      setMessages(prev => [...prev, { role: 'model', content: text }]);
     } catch (err: any) {
       console.error('Chat error:', err);
       
@@ -195,6 +200,12 @@ export default function Chatbot() {
           type: 'SAFETY',
           message: "I'm unable to discuss this specific topic due to safety guidelines.",
           suggestion: "Try rephrasing your question to focus on Astheron's engineering and technology services."
+        };
+      } else if (err.message?.includes('429') || err.message?.includes('quota') || err.message?.includes('RESOURCE_EXHAUSTED') || err.status === 429) {
+        errorDetail = {
+          type: 'GENERIC',
+          message: "Aron AI is temporarily at capacity.",
+          suggestion: "Our AI quota has been reached. Please try again in a few minutes."
         };
       } else if (err.message === 'EMPTY_RESPONSE') {
         errorDetail = {
@@ -229,32 +240,42 @@ export default function Chatbot() {
 
   return (
     <>
-      <button
+      <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 z-[100] p-4 bg-white text-black rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2.5, type: "spring", stiffness: 300, damping: 20 }}
+        whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(255,255,255,0.25)" }}
+        whileTap={{ scale: 0.9 }}
+        className="fixed bottom-8 right-8 z-[100] w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_40px_rgba(255,255,255,0.15)] transition-shadow flex items-center justify-center"
         aria-label="Open Aron AI assistant"
         aria-expanded={isOpen}
         aria-controls="chatbot-window"
       >
-        <MessageSquare className="w-6 h-6" aria-hidden="true" />
-      </button>
+        <img src="/logo (1).png" alt="Aron AI" className="w-7 h-7" />
+        <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-brand-bg animate-pulse" />
+      </motion.button>
 
-      <AnimatePresence>
-        {isOpen && createPortal(
-          <motion.div
+      {isOpen && createPortal(
+          <div
             id="chatbot-window"
             role="dialog"
             aria-label="Aron AI Chat Assistant"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-8 z-[100] w-[400px] h-[600px] glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl"
+            style={{
+              position: 'fixed',
+              bottom: '6rem',
+              right: '2rem',
+              zIndex: 9999,
+              width: '400px',
+              height: '600px',
+            }}
+            className="rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0a]/95 backdrop-blur-xl"
           >
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-black" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                  <img src="/logo (1).png" alt="Aron AI" className="w-7 h-7" />
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-sm">Aron AI</h3>
@@ -289,12 +310,12 @@ export default function Chatbot() {
                 >
                   <div className={cn(
                     "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                    msg.role === 'user' ? "bg-white/10" : "bg-white"
+                    msg.role === 'user' ? "bg-white/10" : ""
                   )}>
                     {msg.role === 'user' ? (
                       <User className="w-4 h-4" aria-hidden="true" />
                     ) : (
-                      <Bot className="w-4 h-4 text-black" aria-hidden="true" />
+                      <img src="/logo (1).png" alt="" className="w-6 h-6" />
                     )}
                   </div>
                   <div className={cn(
@@ -364,8 +385,8 @@ export default function Chatbot() {
 
               {isLoading && (
                 <div className="flex gap-3 mr-auto" role="status" aria-label="Aron is thinking">
-                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center animate-pulse">
-                    <Sparkles className="w-4 h-4 text-black" aria-hidden="true" />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center animate-pulse">
+                    <img src="/logo (1).png" alt="" className="w-6 h-6" />
                   </div>
                   <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-1.5">
                     {[0, 1, 2].map((i) => (
@@ -465,10 +486,9 @@ export default function Chatbot() {
                 <p className="text-[10px] text-white/40 mt-2 uppercase tracking-widest animate-pulse">Processing files...</p>
               )}
             </div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+          </div>,
+        document.body
+      )}
     </>
   );
 }
